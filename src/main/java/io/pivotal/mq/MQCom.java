@@ -18,7 +18,8 @@ public class MQCom {
         options.addOption("q", "queue", true, "Queue");
         options.addOption("u", "user", true, "User");
         options.addOption("p", "password", true, "Password");
-        options.addOption("i", "sender-implementation", true, "Use MQQueueManager implementation to send message");
+        options.addOption("i", "sender-implementation", true, "Use MQQueueManager implementation to send message." +
+                " Possible values are: queue, fromtest, default, factory ");
     }
 
     public void parse() {
@@ -77,25 +78,31 @@ public class MQCom {
                     mqSender = new MQQueueManagerSender();
                 else if ("fromtest".equalsIgnoreCase(senderImplementation))
                     mqSender = new MQFromTestMessageSender();
-                else if ("factory".equalsIgnoreCase(senderImplementation)){
+                else if ("default".equalsIgnoreCase(senderImplementation))
+                    mqSender = new MQDefaultMessageSender();
+                else if ("factory".equalsIgnoreCase(senderImplementation)) {
                     mqSender = new MQFromTestMessageSender();
                 }
             } else {
                 mqSender = new MQFactoryManagerSender();
             }
             log.info("Running test with " + mqSender.getClass().getCanonicalName());
-            log.info("Host: " + host
-                + " Port: " + port
-            + "Queue Manager: " + queueManager
-            + " Channel: " + channel
-            + "Queue name: " + queueName
-            + " User: " + user);
+            log.info(" Host: " + host + nl()
+                    + " Port: " + port + nl()
+                    + " Queue Manager: " + queueManager + nl()
+                    + " Channel: " + channel + nl()
+                    + " Queue name: " + queueName + nl()
+                    + " User: " + user);
             mqSender.send(host, port, queueManager, channel, queueName, user, pwd);
 
         } catch (Exception e) {
             log.log(Level.SEVERE, "Failed to parse comand line properties", e);
             help();
         }
+    }
+
+    private String nl() {
+        return System.getProperty("line.separator");
     }
 
     private void help() {
