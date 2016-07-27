@@ -34,7 +34,6 @@ public class MQCom {
 
             if (cmd.hasOption("ho")) {
                 host = cmd.getOptionValue("ho");
-                log.info("Host: " + host);
             } else {
                 log.log(Level.SEVERE, "MIssing host option");
                 help();
@@ -42,7 +41,6 @@ public class MQCom {
 
             if (cmd.hasOption("p")) {
                 port = Integer.parseInt(cmd.getOptionValue("p"));
-                log.info("Port: " + port);
             } else {
                 log.log(Level.SEVERE, "MIssing port option");
                 help();
@@ -50,7 +48,6 @@ public class MQCom {
 
             if (cmd.hasOption("qm")) {
                 queueManager = cmd.getOptionValue("qm");
-                log.info("Queue Manager: " + queueManager);
             } else {
                 log.log(Level.SEVERE, "MIssing queue manager option");
                 help();
@@ -58,12 +55,10 @@ public class MQCom {
 
             if (cmd.hasOption("c")) {
                 channel = cmd.getOptionValue("c");
-                log.info("Channel: " + channel);
             }
 
             if (cmd.hasOption("q")) {
                 queueName = cmd.getOptionValue("q");
-                log.info("Channel: " + queueName);
 
             } else {
                 log.log(Level.SEVERE, "MIssing queue option");
@@ -72,17 +67,29 @@ public class MQCom {
 
             if (cmd.hasOption("u")) {
                 user = cmd.getOptionValue("u");
-                log.info("User: " + user);
-
-                pwd = cmd.hasOption("p")?cmd.getOptionValue("p"):null;
+                pwd = cmd.hasOption("p") ? cmd.getOptionValue("p") : null;
             }
 
             MQSender mqSender = null;
             if (cmd.hasOption("i")) {
-                mqSender = new MQQueueManagerSender();
+                String senderImplementation = cmd.getOptionValue("i");
+                if ("queue".equalsIgnoreCase(senderImplementation))
+                    mqSender = new MQQueueManagerSender();
+                else if ("fromtest".equalsIgnoreCase(senderImplementation))
+                    mqSender = new MQFromTestMessageSender();
+                else if ("factory".equalsIgnoreCase(senderImplementation)){
+                    mqSender = new MQFromTestMessageSender();
+                }
             } else {
-               mqSender = new MQFactoryManagerSender();
+                mqSender = new MQFactoryManagerSender();
             }
+            log.info("Running test with " + mqSender.getClass().getCanonicalName());
+            log.info("Host: " + host
+                + " Port: " + port
+            + "Queue Manager: " + queueManager
+            + " Channel: " + channel
+            + "Queue name: " + queueName
+            + " User: " + user);
             mqSender.send(host, port, queueManager, channel, queueName, user, pwd);
 
         } catch (Exception e) {

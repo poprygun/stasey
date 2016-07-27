@@ -29,20 +29,17 @@ public class MQQueueManagerSender implements MQSender {
 
         MQQueue destQueue = qMgr.accessQueue(queueName, openOptions);
         log.info("Queue size:" + destQueue.getCurrentDepth());
-        MQMessage hello_world = new MQMessage();
+        MQMessage mqMessage = new MQMessage();
         log.info("MQMessage message created");
-        hello_world.writeUTF("Sending Sample message");
+        mqMessage.writeUTF("Sending Sample message");
         MQPutMessageOptions pmo = new MQPutMessageOptions();
-        try {
-            destQueue.put(hello_world, pmo);
-            destQueue.get(hello_world);
-        } catch (Exception e) {
-            log.info(e.getMessage());
-        }
 
-        int len = hello_world.getDataLength();
+        destQueue.put(mqMessage, pmo);
+        destQueue.get(mqMessage);
+
+        int len = mqMessage.getDataLength();
         log.info("Length : " + len);
-        log.info("GET: " + hello_world.readString(len - 1));
+        log.info("GET: " + mqMessage.readString(len - 1));
         destQueue.close();
         qMgr.disconnect();
 
