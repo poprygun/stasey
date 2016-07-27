@@ -19,7 +19,7 @@ public class MQFactoryManagerSender implements MQSender {
         try {
             cf.setHostName(host);
             cf.setPort(port);
-//        cf.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP);
+            cf.setTransportType(WMQConstants.WMQ_CM_CLIENT);
             cf.setIntProperty(WMQConstants.WMQ_CONNECTION_MODE, WMQConstants.WMQ_CM_CLIENT);
             cf.setChannel(channel);
             cf.setQueueManager(queueManager);
@@ -31,6 +31,8 @@ public class MQFactoryManagerSender implements MQSender {
                 connection = (MQQueueConnection) cf.createQueueConnection();
             }
 
+            connection.start();
+
             log.info("****Created connection");
             session = (MQQueueSession) connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
             log.info("****Created session");
@@ -40,7 +42,7 @@ public class MQFactoryManagerSender implements MQSender {
             log.info("****Created sender");
             TextMessage message = (TextMessage) session.createTextMessage("Hello");
 
-            connection.start();
+
             log.info("****Stated connection");
             sender.send(message);
             log.info("****Message sent");
